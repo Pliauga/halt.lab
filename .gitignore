@@ -1,0 +1,13 @@
+# Local environment & transient files
+.localstack/
+.DS_Store
+*.zip
+.env
+
+# Terraform local state and modules
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json

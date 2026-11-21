@@ -1,5 +1,17 @@
 terraform {
   required_version = ">= 1.5.0"
+
+  # Remote state for live deployments. Kept commented so `terraform init` works
+  # against the local emulator without remote credentials; enable it (and supply
+  # the values with -backend-config or a *.backend.hcl file) before the first
+  # production apply. See README "Live AWS deployment".
+  #
+  # backend "s3" {
+  #   key          = "halt-lab/terraform.tfstate"
+  #   encrypt      = true
+  #   use_lockfile = true
+  # }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -8,6 +20,10 @@ terraform {
     archive = {
       source  = "hashicorp/archive"
       version = "~> 2.4"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
     }
   }
 }
@@ -30,7 +46,9 @@ provider "aws" {
       sqs            = var.local_endpoint
       sns            = var.local_endpoint
       lambda         = var.local_endpoint
+      cloudwatch     = var.local_endpoint
       cloudwatchlogs = var.local_endpoint
+      cloudtrail     = var.local_endpoint
       events         = var.local_endpoint
       sts            = var.local_endpoint
     }

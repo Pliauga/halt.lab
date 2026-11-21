@@ -32,3 +32,18 @@ output "lambda_function_name" {
   description = "Name of the deployed Security Scanner Lambda"
   value       = aws_lambda_function.security_scanner.function_name
 }
+
+output "bucket_suffix" {
+  description = "Suffix that makes the vault bucket names globally unique"
+  value       = local.bucket_suffix
+}
+
+output "quarantine_kms_key_arn" {
+  description = "ARN of the dedicated KMS key protecting the Quarantine Vault"
+  value       = aws_kms_key.quarantine_cmk.arn
+}
+
+output "scanner_log_group" {
+  description = "CloudWatch log group receiving scanner output"
+  value       = aws_cloudwatch_log_group.scanner.name
+}

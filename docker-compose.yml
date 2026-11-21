@@ -1,11 +1,16 @@
 services:
   floci:
     container_name: halt-lab-floci
-    image: floci/floci:latest
+    # Pinned to an immutable digest so a re-tag of :latest cannot silently
+    # change the emulator the stack is verified against.
+    image: floci/floci@sha256:5ee85db604c4aa74ac76e07ea5cc83086f37bb472bf3dbb97e34019e48efae9c
     ports:
       - "127.0.0.1:4566:4566"
     environment:
       - AWS_DEFAULT_REGION=us-east-1
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
+      # Floci runs Lambda functions as sibling containers, so it needs the
+      # Docker socket. This is a local-only convenience: never mount it on a
+      # shared or production host.
       - "/var/run/docker.sock:/var/run/docker.sock"

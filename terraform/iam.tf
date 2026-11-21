@@ -26,29 +26,37 @@ resource "aws_iam_policy" "lambda_security_policy" {
         Sid    = "CloudWatchLogs"
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:*:*:*"
+        Resource = "${aws_cloudwatch_log_group.scanner.arn}:*"
       },
       {
         Sid    = "PrimaryVaultReadTagDelete"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:GetObjectTagging",
           "s3:PutObjectTagging",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion"
         ]
         Resource = "${aws_s3_bucket.data_vault.arn}/*"
+      },
+      {
+        Sid      = "PrimaryVaultListVersions"
+        Effect   = "Allow"
+        Action   = "s3:ListBucketVersions"
+        Resource = aws_s3_bucket.data_vault.arn
       },
       {
         Sid    = "QuarantineVaultWrite"
         Effect = "Allow"
         Action = [
           "s3:PutObject",
-          "s3:PutObjectTagging"
+          "s3:PutObjectTagging",
+          "s3:GetObjectTagging"
         ]
         Resource = "${aws_s3_bucket.quarantine_vault.arn}/*"
       },
@@ -63,11 +71,9 @@ resource "aws_iam_policy" "lambda_security_policy" {
         Resource = aws_sqs_queue.security_event_queue.arn
       },
       {
-        Sid    = "SNSPublisher"
-        Effect = "Allow"
-        Action = [
-          "sns:Publish"
-        ]
+        Sid      = "SNSPublisher"
+        Effect   = "Allow"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.security_alerts.arn
       },
       {
@@ -78,7 +84,19 @@ resource "aws_iam_policy" "lambda_security_policy" {
           "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ]
-        Resource = aws_kms_key.security_cmk.arn
+        Resource = [
+          aws_kms_key.security_cmk.arn,
+          aws_kms_key.quarantine_cmk.arn
+        ]
+      },
+      {
+        Sid    = "XRayTracing"
+        Effect = "Allow"
+        Action = [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords"
+        ]
+        Resource = "*"
       }
     ]
   })

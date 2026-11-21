@@ -6,5 +6,6 @@ TF_DIR="$(cd "${SCRIPT_DIR}/../terraform" && pwd)"
 
 cd "$TF_DIR"
 terraform init -input=false
-terraform apply -auto-approve -input=false
+# Extra arguments are forwarded, e.g. ./scripts/deploy.sh -var="is_local=false".
+terraform apply -auto-approve -input=false "$@"
 terraform output

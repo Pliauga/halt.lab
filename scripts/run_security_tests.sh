@@ -34,6 +34,8 @@ SQS_QUEUE_URL=$(terraform -chdir="$TF_DIR" output -raw sqs_event_queue_url)
 SQS_DLQ_URL=$(terraform -chdir="$TF_DIR" output -raw sqs_dlq_url)
 
 WORK_DIR=$(mktemp -d)
+# Invoked indirectly via `trap cleanup EXIT`.
+# shellcheck disable=SC2329
 cleanup() {
   rm -rf "$WORK_DIR"
 }
@@ -70,6 +72,8 @@ wait_until() { # wait_until <attempts> <predicate> [args...]
   return 1
 }
 
+# Invoked indirectly via the wait_until polling helper.
+# shellcheck disable=SC2329
 has_security_tag() { # has_security_tag <bucket> <key> <value>
   aws_cmd s3api get-object-tagging --bucket "$1" --key "$2" --output json 2>/dev/null \
     | jq -e --arg v "$3" 'any(.TagSet[]?; .Key == "SecurityStatus" and .Value == $v)' > /dev/null
@@ -82,6 +86,8 @@ tag_value() { # tag_value <bucket> <key> <tag-key>
   printf '%s' "$value"
 }
 
+# Invoked indirectly via the wait_until polling helper.
+# shellcheck disable=SC2329
 has_no_versions() { # has_no_versions <bucket> <key>
   local listing
   listing=$(aws_cmd s3api list-object-versions --bucket "$1" --prefix "$2" --output json 2>/dev/null) || return 1
@@ -96,6 +102,8 @@ quarantine_key_for() { # quarantine_key_for <substring> -> prints key or nothing
   printf '%s' "$found"
 }
 
+# Invoked indirectly via the wait_until polling helper.
+# shellcheck disable=SC2329
 dlq_not_empty() {
   local depth
   depth=$(aws_cmd sqs get-queue-attributes --queue-url "$SQS_DLQ_URL" \

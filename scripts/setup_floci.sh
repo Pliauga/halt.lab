@@ -11,7 +11,7 @@ cd "$ROOT_DIR"
 docker compose up -d
 
 echo "Waiting for Floci gateway (${ENDPOINT})..."
-for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+for _ in $(seq 1 "$MAX_ATTEMPTS"); do
   if curl -sf "${ENDPOINT}/" > /dev/null 2>&1 \
     || curl -sf "${ENDPOINT}/_floci/health" > /dev/null 2>&1 \
     || curl -sf "${ENDPOINT}/_localstack/health" > /dev/null 2>&1; then

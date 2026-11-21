@@ -13,6 +13,7 @@ import io
 import json
 import os
 import pathlib
+import sys
 import unittest
 from unittest import mock
 
@@ -22,6 +23,9 @@ MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "lambda" / "security
 _spec = importlib.util.spec_from_file_location("security_scanner", MODULE_PATH)
 scanner = importlib.util.module_from_spec(_spec)
 assert _spec and _spec.loader
+# Python 3.13+ resolves `cls.__module__` through sys.modules while creating the
+# @dataclass types, so the module must be registered before exec_module.
+sys.modules[_spec.name] = scanner
 _spec.loader.exec_module(scanner)
 
 FAKE_AWS_KEY_ID = "AKIA" + "IOSFODNN7EXAMPLE"

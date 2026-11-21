@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="security_scanner">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lambda/security_scanner.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
